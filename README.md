@@ -5,14 +5,14 @@ It's designed to work with modern frontend frameworks like Angular v8+.
 ## Installation
 
 ```BASH
-npm install thruway.ts
+npm install @wamp/thruway.ts
 npm install rxjs
 ```
 
 ## Usage
 
 ```JS
-import { Client } from "thruway.ts";
+import { Client } from "@wamp/thruway.ts";
 
 const wamp = new Client('ws://localhost:9090', 'realm1');
 ```
@@ -57,7 +57,7 @@ Create a wamp service
 
 ```JS
 import {Injectable} from '@angular/core';
-import {Client} from 'thruway.ts';
+import {Client} from '@wamp/thruway.ts';
 
 @Injectable()
 export class WampService extends Client {
@@ -73,7 +73,7 @@ Inject and use the service in your component
 import {Component} from '@angular/core';
 import {WampService} from '../wamp.service';
 import {Observable} from 'rxjs/Observable';
-import {EventMessage} from 'thruway.js/src/Messages/EventMessage';
+import {EventMessage} from '@wamp/thruway.ts/src/Messages/EventMessage';
 
 @Component({
     selector: 'app-counter',

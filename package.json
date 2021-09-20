@@ -1,11 +1,11 @@
 {
-  "name": "thruway.ts",
+  "name": "@wamp/thruway.ts",
   "version": "1.0.0",
   "description": "WAMP RxJS Client, Update RxJS to version 6",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/voryx/Thruway.js.git"
+    "url": "git+https://github.com/D-Mino/thruway.ts.git"
   },
   "keywords": [
     "wamp",
@@ -15,9 +15,9 @@
   "author": "David Dan <davidwdan@gmail.com> (http://voryx.net)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/voryx/Thruway.js/issues"
+    "url": "https://github.com/D-Mino/thruway.ts/issues"
   },
-  "homepage": "https://github.com/voryx/Thruway.js#readme",
+  "homepage": "https://github.com/D-Mino/thruway.ts#readme",
   "peerDependencies": {
     "rxjs": "~6.6.0",
     "ws": "^8.2.2"
@@ -33,5 +33,6 @@
     "tslint": "^5.2.0",
     "typescript": "~4.0.2",
     "ws": "^8.2.2"
-  }
+  },
+  "dependencies": {}
 }
