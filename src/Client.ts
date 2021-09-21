@@ -1,30 +1,30 @@
-import { WampChallengeException } from './Common/WampChallengeException';
-import { WebSocketTransport } from './Transport/WebSocketTransport';
+import { WampChallengeException } from "./Common/WampChallengeException";
+import { WebSocketTransport } from "./Transport/WebSocketTransport";
 import {
   RegisterObservable,
   RegisterOptions,
-} from './Observable/RegisterObservable';
-import { AuthenticateMessage } from './Messages/AuthenticateMessage';
-import { WampErrorException } from './Common/WampErrorException';
+} from "./Observable/RegisterObservable";
+import { AuthenticateMessage } from "./Messages/AuthenticateMessage";
+import { WampErrorException } from "./Common/WampErrorException";
 import {
   PublishOptions,
   TopicObservable,
   TopicOptions,
-} from './Observable/TopicObservable';
-import { ChallengeMessage } from './Messages/ChallengeMessage';
-import { CallObservable, CallOptions } from './Observable/CallObservable';
-import { GoodbyeMessage } from './Messages/GoodbyeMessage';
-import { WelcomeMessage } from './Messages/WelcomeMessage';
-import { PublishMessage } from './Messages/PublishMessage';
-import { ResultMessage } from './Messages/ResultMessage';
-import { RegisteredMessage } from './Messages/RegisteredMessage';
-import { UnregisteredMessage } from './Messages/UnregisteredMessage';
-import { EventMessage } from './Messages/EventMessage';
-import { HelloMessage } from './Messages/HelloMessage';
-import { AbortMessage } from './Messages/AbortMessage';
-import { OpenMessage } from './Messages/OpenMessage';
-import { IMessage } from './Messages/Message';
-import { Utils } from './Common/Utils';
+} from "./Observable/TopicObservable";
+import { ChallengeMessage } from "./Messages/ChallengeMessage";
+import { CallObservable, CallOptions } from "./Observable/CallObservable";
+import { GoodbyeMessage } from "./Messages/GoodbyeMessage";
+import { WelcomeMessage } from "./Messages/WelcomeMessage";
+import { PublishMessage } from "./Messages/PublishMessage";
+import { ResultMessage } from "./Messages/ResultMessage";
+import { RegisteredMessage } from "./Messages/RegisteredMessage";
+import { UnregisteredMessage } from "./Messages/UnregisteredMessage";
+import { EventMessage } from "./Messages/EventMessage";
+import { HelloMessage } from "./Messages/HelloMessage";
+import { AbortMessage } from "./Messages/AbortMessage";
+import { OpenMessage } from "./Messages/OpenMessage";
+import { IMessage } from "./Messages/Message";
+import { Utils } from "./Common/Utils";
 
 import {
   Observable,
@@ -35,7 +35,7 @@ import {
   Subscription,
   throwError,
   timer,
-} from 'rxjs';
+} from "rxjs";
 import {
   catchError,
   combineLatest,
@@ -57,7 +57,7 @@ import {
   take,
   takeUntil,
   tap,
-} from 'rxjs/operators';
+} from "rxjs/operators";
 
 export class Client {
   private static roles = {
@@ -113,7 +113,7 @@ export class Client {
   ) => Observable<string> = () =>
     throwError(
       Error(
-        'When trying to make a WAMP connection, we received a Challenge Message, but no `onChallenge` callback was set.'
+        "When trying to make a WAMP connection, we received a Challenge Message, but no `onChallenge` callback was set."
       )
     );
 
@@ -129,7 +129,7 @@ export class Client {
       } = o;
 
       return attempts.pipe(
-        mergeMap((ex) => {
+        mergeMap((ex: any) => {
           console.error(ex.message);
           const delay = Math.min(
             maxRetryDelay as number,
@@ -137,11 +137,11 @@ export class Client {
               (initialRetryDelay ? initialRetryDelay : 0)
           );
           console.log(
-            'Reconnecting attempt: ' +
+            "Reconnecting attempt: " +
               this.currentRetryCount +
-              ', Retrying in: ' +
+              ", Retrying in: " +
               (delay / 1000).toPrecision(4) +
-              ' seconds.'
+              " seconds."
           );
           return timer(Math.floor(delay));
         }),
@@ -156,9 +156,9 @@ export class Client {
     options: WampOptions = {}
   ) {
     let transportData: Observable<TransportData>;
-    if (typeof urlOrTransportOrObs === 'string') {
+    if (typeof urlOrTransportOrObs === "string") {
       this._transport = new WebSocketTransport(urlOrTransportOrObs, [
-        'wamp.2.json',
+        "wamp.2.json",
       ]);
       transportData = (of({
         transport: this._transport,
@@ -177,7 +177,7 @@ export class Client {
         map((config: ThruwayConfig) => {
           this._transport = new WebSocketTransport(
             config.url,
-            ['wamp.2.json'],
+            ["wamp.2.json"],
             config.autoOpen
           );
           return {
@@ -190,26 +190,26 @@ export class Client {
     }
 
     transportData = transportData.pipe(
-      tap(({ transport }) => this.subscription.add(transport)),
+      tap(({ transport }: any) => this.subscription.add(transport)),
       take(1),
       shareReplay(1)
     );
 
     const messages = transportData.pipe(
-      switchMap(({ transport, options: o, realm: r }) =>
+      switchMap(({ transport, options: o, realm: r }: any) =>
         transport.pipe(
           map((msg: IMessage) => {
             if (msg instanceof AbortMessage) {
               // @todo create an exception for this
               throw new Error(
-                'Connection ended because ' +
+                "Connection ended because " +
                   JSON.stringify(msg.details) +
                   msg.reason
               );
             }
             return msg as never;
           }),
-          tap((msg) => {
+          tap((msg: any) => {
             let instance: any = msg;
             if (instance instanceof OpenMessage) {
               this.currentRetryCount = 0;
@@ -219,10 +219,10 @@ export class Client {
           }),
           race(
             timer(options.timeout || 5000).pipe(
-              switchMapTo(throwError(Error('Transport Timeout')))
+              switchMapTo(throwError(Error("Transport Timeout")))
             )
           ),
-          tap({ error: (e) => this._onError.next(e) }),
+          tap({ error: (e: any) => this._onError.next(e) }),
           retryWhen(o.retryWhen || this.defaultRetryWhen(options.retryOptions))
         )
       ),
@@ -242,19 +242,19 @@ export class Client {
 
     [goodByeMsg, remainingMsgs] = partition(
       remainingMsgs,
-      (msg) => msg instanceof GoodbyeMessage
+      (msg: any) => msg instanceof GoodbyeMessage
     );
 
     [abortMsg, remainingMsgs] = partition(
       remainingMsgs,
-      (msg) => msg instanceof AbortMessage
+      (msg: any) => msg instanceof AbortMessage
     );
 
-    goodByeMsg = goodByeMsg.pipe(tap((v) => this._onClose.next(v)));
+    goodByeMsg = goodByeMsg.pipe(tap((v: any) => this._onClose.next(v)));
 
     remainingMsgs = remainingMsgs.pipe(merge(goodByeMsg));
 
-    abortMsg = abortMsg.pipe(tap((v) => this._onClose.next(v)));
+    abortMsg = abortMsg.pipe(tap((v: any) => this._onClose.next(v)));
 
     const challenge = this.challenge(challengeMsg).pipe(
       combineLatest(transportData),
@@ -263,7 +263,7 @@ export class Client {
 
     const abortError = abortMsg.pipe(
       map((msg: any) => {
-        throw new Error(msg.details.message + ' ' + msg.reason);
+        throw new Error(msg.details.message + " " + msg.reason);
       })
     );
 
@@ -272,7 +272,7 @@ export class Client {
         merge(challenge.pipe(share())),
         merge(abortError.pipe(share()))
       ),
-      (msg): any => msg instanceof WelcomeMessage
+      (msg: any): any => msg instanceof WelcomeMessage
     ) as [Observable<WelcomeMessage>, Observable<IMessage>];
 
     this._session = welcomeMsg.pipe(
@@ -303,7 +303,7 @@ export class Client {
     options?: PublishOptions
   ): Subscription {
     const obs =
-      typeof value.subscribe === 'function'
+      typeof value.subscribe === "function"
         ? (value as Observable<T>)
         : of(value);
     const completed = new Subject();
@@ -311,11 +311,19 @@ export class Client {
     return this._session
       .pipe(
         takeUntil(completed),
-        map(({ transport }) =>
+        map(({ transport }: any) =>
           obs.pipe(
             finalize(() => completed.next(0)),
-            map((v) => new PublishMessage(Utils.uniqueId(), options as PublishOptions, uri, [v])),
-            tap((m) => transport.next(m))
+            map(
+              (v: any) =>
+                new PublishMessage(
+                  Utils.uniqueId(),
+                  options as PublishOptions,
+                  uri,
+                  [v]
+                )
+            ),
+            tap((m: any) => transport.next(m))
           )
         ),
         exhaust(),
@@ -333,7 +341,7 @@ export class Client {
     return this._session.pipe(
       merge(
         this.onClose.pipe(
-          flatMap(() => Observable.throw(new Error('Connection Closed')))
+          flatMap(() => Observable.throw(new Error("Connection Closed")))
         )
       ),
       take(1),
@@ -352,7 +360,7 @@ export class Client {
     return this._session.pipe(
       merge(
         this.onClose.pipe(
-          flatMap(() => Observable.throw(new Error('Connection Closed')))
+          flatMap(() => Observable.throw(new Error("Connection Closed")))
         )
       ),
       switchMap(
@@ -373,10 +381,10 @@ export class Client {
     let retry = false;
 
     return this._session.pipe(
-      merge(this.onError.pipe(flatMap((e) => Observable.throw(e)))),
+      merge(this.onError.pipe(flatMap((e: any) => Observable.throw(e)))),
       merge(
         this.onClose.pipe(
-          flatMap(() => Observable.throw(new Error('Connection Closed')))
+          flatMap(() => Observable.throw(new Error("Connection Closed")))
         )
       ),
       takeUntil(completed),
@@ -396,7 +404,7 @@ export class Client {
         return errors.pipe(
           flatMap((e: WampErrorException) => {
             // start retrying when we get a canceled error and continue retrying until we get a value
-            if (e.errorUri === 'wamp.error.canceled' || retry) {
+            if (e.errorUri === "wamp.error.canceled" || retry) {
               retry = true;
               return of(e);
             }
@@ -415,7 +423,7 @@ export class Client {
     options: RegisterOptions = {}
   ): Observable<any> {
     options.progress = true;
-    options.replace_orphaned_sessions = 'yes';
+    options.replace_orphaned_sessions = "yes";
     return this.register(uri, callback, options);
   }
 

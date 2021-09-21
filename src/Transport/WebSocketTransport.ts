@@ -1,7 +1,6 @@
 import { CreateMessage } from '../Messages/CreateMessage';
 import { OpenMessage } from '../Messages/OpenMessage';
 import { Subject, Subscriber, Subscription, fromEvent, timer, of } from 'rxjs';
-import * as WebSocketType from 'ws';
 
 import {
   catchError,
@@ -11,6 +10,10 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators';
+
+interface WebSocketType extends WebSocket {
+  [key: string]: any;
+};
 
 export class WebSocketTransport<M> extends Subject<M> {
   private output: Subject<any> = new Subject();
@@ -105,7 +108,7 @@ export class WebSocketTransport<M> extends Subject<M> {
           )
         ),
         takeUntil(this.resetKeepaliveSubject),
-        catchError((e) => {
+        catchError((e: any) => {
           console.log(e.message);
           return of();
         })
